@@ -2,15 +2,7 @@
   <div ref="recommend" class="recommend">
     <scroll ref="scroll" class="recommend-content" :data="discList">
       <div>
-        <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
-          <slider>
-            <div v-for="item in recommends" :key="item.id">
-              <a :href="item.linkUrl">
-                <img  class="needsclick" @load="loadImage" :src="item.picUrl" />
-              </a>
-            </div>
-          </slider>
-        </div>
+        <slider :list="recommends"></slider>
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
           <ul>
@@ -67,12 +59,6 @@ export default {
           // console.log(res.data.list)
         }
       })
-    },
-    loadImage() {
-      if (!this.checkLoaded) {
-        this.$refs.scroll.refresh()
-        this.checkLoaded = true
-      }
     }
   },
   components: {
@@ -94,10 +80,6 @@ export default {
     .recommend-content
       height: 100%
       overflow: hidden
-      .slider-wrapper
-        position: relative
-        width: 100%
-        overflow: hidden
       .recommend-list
         .list-title
           height: 65px
