@@ -5,7 +5,7 @@
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage">
-      <div class="play-wrapper">
+      <div class="play-wrapper" @click="random">
         <div ref="playBtn" v-show="songs.length>0" class="play">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
@@ -17,7 +17,7 @@
     <scroll :data="songs" @scroll="scroll"
             :listen-scroll="listenScroll" :probe-type="probeType" class="list" ref="list">
       <div class="song-list-wrapper">
-        <song-list :songs="songs"></song-list>
+        <song-list @select="selectItem" :songs="songs"></song-list>
       </div>
       <div v-show="!songs.length" class="loading-container">
         <loading></loading>
@@ -31,12 +31,15 @@ import Scroll from 'base/scroll/scroll'
 import Loading from 'base/loading/loading'
 import SongList from 'base/song-list/song-list'
 import {prefixStyle} from 'common/js/dom'
+import {mapActions} from 'vuex'
+import {playlistMixin} from 'common/js/mixin'
 
 const RESERVED_HEIGHT = 40
 const transform = prefixStyle('transform')
 const backdrop = prefixStyle('backdrop-filter')
 
 export default {
+  mixins: [playlistMixin],
   props: {
     bgImage: {
       type: String,
@@ -78,7 +81,27 @@ export default {
     },
     back() {
       this.$router.back()
-    }
+    },
+    selectItem(item, index) {
+      this.selectPlay({
+        list: this.songs,
+        index
+      })
+    },
+    random() {
+      this.randomPlay({
+        list: this.songs
+      })
+    },
+    handlePlaylist(playlist) {
+      const bottom = playlist.length > 0 ? '60px' : ''
+      this.$refs.list.$el.style.bottom = bottom
+      this.$refs.list.refresh()
+    },
+    ...mapActions([
+      'selectPlay',
+      'randomPlay'
+    ])
   },
   watch: {
     scrollY(newVal) {
@@ -86,6 +109,7 @@ export default {
       let scale = 1
       let zIndex = 0
       let blur = 0
+      // 下拉改变图片大小
       const percent = Math.abs(newVal / this.imageHeight)
       if (newVal > 0) {
         scale = 1 + percent
@@ -93,9 +117,7 @@ export default {
       } else {
         blur = Math.min(20, percent * 20)
       }
-
-      this.$refs.layer.style[transform] = `translate3d(0,${translateY}px,0)`
-      this.$refs.filter.style[backdrop] = `blur(${blur}px)`
+      // 改变图片宽高和z-index
       if (newVal < this.minTransalteY) {
         zIndex = 10
         this.$refs.bgImage.style.paddingTop = 0
@@ -106,6 +128,10 @@ export default {
         this.$refs.bgImage.style.height = 0
         this.$refs.playBtn.style.display = ''
       }
+
+      this.$refs.layer.style[transform] = `translate3d(0,${translateY}px,0)`
+      // 高斯模糊，仅ios有效
+      this.$refs.filter.style[backdrop] = `blur(${blur}px)`
       this.$refs.bgImage.style[transform] = `scale(${scale})`
       this.$refs.bgImage.style.zIndex = zIndex
     }
