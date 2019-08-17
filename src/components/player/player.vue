@@ -77,8 +77,10 @@
     </transition>
     <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="open">
-        <div class="icon" ref="miniWrapper">
-          <img ref="miniImage" width="40" height="40"  :class="cdCls" :src="currentSong.image">
+        <div class="icon">
+          <div class="imgWrapper" ref="miniWrapper">
+            <img ref="miniImage" width="40" height="40"  :class="cdCls" :src="currentSong.image">
+          </div>
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
@@ -540,8 +542,6 @@ export default {
             .cd
               width: 100%
               height: 100%
-              box-sizing: border-box
-              border: 10px solid rgba(255, 255, 255, 0.1)
               border-radius: 50%
               .image
                 position: absolute
@@ -549,10 +549,11 @@ export default {
                 top: 0
                 width: 100%
                 height: 100%
+                box-sizing: border-box
                 border-radius: 50%
+                border: 10px solid rgba(255, 255, 255, 0.1)
               .play
                 animation: rotate 20s linear infinite
-
           .playing-lyric-wrapper
             width: 80%
             margin: 50px auto 0 auto
@@ -665,13 +666,17 @@ export default {
       .icon
         flex: 0 0 40px
         width: 40px
+        height: 40px
         padding: 0 10px 0 20px
-        img
-          border-radius: 50%
-          &.play
-            animation: rotate 10s linear infinite
-          &.pause
-            animation-play-state: paused
+        .imgWrapper
+          height: 100%
+          width: 100%
+          img
+            border-radius: 50%
+            &.play
+              animation: rotate 10s linear infinite
+            &.pause
+              animation-play-state: paused
       .text
         display: flex
         flex-direction: column
