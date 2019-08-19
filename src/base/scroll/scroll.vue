@@ -17,11 +17,19 @@ export default {
       type: Boolean,
       default: true
     },
+    listenScroll: {
+      type: Boolean,
+      default: false
+    },
     data: {
       type: Array,
       default: null
     },
-    listenScroll: {
+    pullup: {
+      type: Boolean,
+      default: false
+    },
+    beforeScroll: {
       type: Boolean,
       default: false
     }
@@ -47,12 +55,26 @@ export default {
           me.$emit('scroll', pos)
         })
       }
-    },
-    enable() {
-      this.scroll && this.scroll.enable()
+
+      if (this.pullup) {
+        this.scroll.on('scrollEnd', () => {
+          if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+            this.$emit('scrollToEnd')
+          }
+        })
+      }
+
+      if (this.beforeScroll) {
+        this.scroll.on('beforeScrollStart', () => {
+          this.$emit('beforeScroll')
+        })
+      }
     },
     disable() {
       this.scroll && this.scroll.disable()
+    },
+    enable() {
+      this.scroll && this.scroll.enable()
     },
     refresh() {
       this.scroll && this.scroll.refresh()
@@ -72,7 +94,6 @@ export default {
     }
   }
 }
-
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
